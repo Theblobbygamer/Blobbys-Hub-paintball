@@ -1,0 +1,192 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextButton = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local TextButton_2 = Instance.new("TextButton")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.219880655, 0, 0.271144271, 0)
+Frame.Size = UDim2.new(0, 710, 0, 385)
+Frame.ZIndex = 0
+
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.888111889, 0, -0.0518358536, 0)
+TextButton.Size = UDim2.new(0, 123, 0, 50)
+TextButton.Font = Enum.Font.SourceSans
+TextButton.Text = "X"
+TextButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+TextButton.TextScaled = true
+TextButton.TextSize = 14.000
+TextButton.TextWrapped = true
+
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0, 0, 0.0987012982, 0)
+TextLabel.Size = UDim2.new(0, 710, 0, 50)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "Big Paintball 2 Script (OP)"
+TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+TextButton_2.Parent = Frame
+TextButton_2.BackgroundColor3 = Color3.fromRGB(0, 255, 17)
+TextButton_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton_2.BorderSizePixel = 0
+TextButton_2.Position = UDim2.new(0.257746488, 0, 0.397402585, 0)
+TextButton_2.Size = UDim2.new(0, 343, 0, 78)
+TextButton_2.Font = Enum.Font.SourceSans
+TextButton_2.Text = "EXECUTE"
+TextButton_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton_2.TextScaled = true
+TextButton_2.TextSize = 14.000
+TextButton_2.TextWrapped = true
+TextButton_2.MouseButton1Down:connect(function()
+	--[[
+	❗❗❗❗ PRESS F TO START THE SCRIPT ❗❗❗❗
+]]
+
+	local Keybind = "F"
+
+	local Players = game:GetService("Players")
+	local LocalPlayer = Players.LocalPlayer
+
+	-- Create UI showing "made by blobby" and The Rock image
+	local function createBlobbyLabel()
+		local screenGui = Instance.new("ScreenGui")
+		screenGui.Name = "BlobbyCredit"
+		screenGui.ResetOnSpawn = false
+		screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+		-- The Rock image (updated with real ID)
+		local image = Instance.new("ImageLabel")
+		image.Size = UDim2.new(0, 50, 0, 50)
+		image.Position = UDim2.new(1, -65, 1, -90)
+		image.BackgroundTransparency = 1
+		image.Image = "rbxassetid://15835285090"
+		image.Parent = screenGui
+
+		-- Text label
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(0, 200, 0, 30)
+		label.Position = UDim2.new(1, -210, 1, -40)
+		label.BackgroundTransparency = 1
+		label.Text = "made by blobby F TO START THE SCRIPT"
+		label.TextColor3 = Color3.new(1, 1, 1)
+		label.TextStrokeTransparency = 0
+		label.TextScaled = true
+		label.Font = Enum.Font.SourceSansBold
+		label.Parent = screenGui
+	end
+
+	createBlobbyLabel()
+
+	local SessionID = string.gsub(tostring(math.random()):sub(3), "%d", function(c)
+		return string.char(96 + math.random(1, 26))
+	end)
+	print('✅ | Running BigPaintball2.lua made by blobby with keybind ' .. Keybind .. '! [SessionID ' .. SessionID .. ']')
+
+	local Enabled = false
+	local UserInputService = game:GetService("UserInputService")
+	local Workspace = game:GetService("Workspace")
+
+	-- Fehlerprotokollierung und Schutz
+	local function safeExecute(func)
+		local success, errorMessage = pcall(func)
+		if not success then
+			warn('⛔ | Error occurred: ' .. errorMessage .. ' [SessionID ' .. SessionID .. ']')
+		end
+	end
+
+	-- Gegner und Spieler an festen Positionen teleportieren
+	local function teleportEntities(cframe, team)
+		local spawnPosition = cframe * CFrame.new(0, 0, -15)
+
+		for _, entity in ipairs(Workspace.__THINGS.__ENTITIES:GetChildren()) do
+			if entity:FindFirstChild("HumanoidRootPart") then
+				local humanoidRootPart = entity.HumanoidRootPart
+				humanoidRootPart.CanCollide = false
+				humanoidRootPart.Anchored = true
+				humanoidRootPart.CFrame = spawnPosition
+			elseif entity:FindFirstChild("Hitbox") then
+				local directory = entity:GetAttribute("Directory")
+				if not (directory == "White" and entity:GetAttribute("OwnerUID") == LocalPlayer.UserId) and 
+					(not team or directory ~= team.Name) then
+					entity.Hitbox.CanCollide = false
+					entity.Hitbox.Anchored = true
+					entity.Hitbox.CFrame = spawnPosition * CFrame.new(math.random(-5, 5), 0, math.random(-5, 5))
+				end
+			end
+		end
+
+		for _, player in ipairs(Players:GetPlayers()) do
+			if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+				if not team or team.Name ~= player.Team.Name then
+					if not player.Character:FindFirstChild("ForceField") then
+						local humanoidRootPart = player.Character.HumanoidRootPart
+						humanoidRootPart.CanCollide = false
+						humanoidRootPart.Anchored = true
+						humanoidRootPart.CFrame = spawnPosition * CFrame.new(math.random(-5, 5), 0, math.random(-5, 5))
+					end
+				end
+			end
+		end
+	end
+
+	UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+		if input.KeyCode == Enum.KeyCode[Keybind] and not gameProcessedEvent then
+			Enabled = not Enabled
+			if Enabled then
+				print('✅ | Enabled BigPaintball2.lua [SessionID ' .. SessionID .. ']')
+			else
+				print('❌ | Disabled BigPaintball2.lua [SessionID ' .. SessionID .. ']')
+			end
+		end
+	end)
+
+	while wait(0.1) do
+		safeExecute(function()
+			if not Enabled or not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				return
+			end
+
+			local cframe = LocalPlayer.Character.HumanoidRootPart.CFrame
+			local team = LocalPlayer.Team
+			teleportEntities(cframe, team)
+		end)
+	end
+
+end)
+
+
+-- Scripts:
+
+local function FZGFZ_fake_script() -- TextButton.LocalScript 
+	local script = Instance.new('LocalScript', TextButton)
+
+	local frame = script.Parent.Parent
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		frame.Visible = false
+	end)
+end
+coroutine.wrap(FZGFZ_fake_script)()
